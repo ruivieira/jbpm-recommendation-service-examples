@@ -8,40 +8,10 @@
     <version>7.15.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jbpm-prediction-random-forest</artifactId>
+  <artifactId>jbpm-recommendation-smile-random-forest</artifactId>
 
   <name>jBPM :: Prediction :: Random Forest based prediction service</name>
   <description>Random Forest based prediction service</description>
-
-  <profiles>
-    <profile>
-      <repositories>
-        <repository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>bintray-ruivieira-maven</id>
-          <name>bintray</name>
-          <url>https://dl.bintray.com/ruivieira/maven</url>
-        </repository>
-        <repository>
-          <id>jcenter</id>
-          <url>https://jcenter.bintray.com/</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>bintray-ruivieira-maven</id>
-          <name>bintray-plugins</name>
-          <url>https://dl.bintray.com/ruivieira/maven</url>
-        </pluginRepository>
-      </pluginRepositories>
-      <id>bintray</id>
-    </profile>
-  </profiles>
 
   <dependencies>
     <dependency>

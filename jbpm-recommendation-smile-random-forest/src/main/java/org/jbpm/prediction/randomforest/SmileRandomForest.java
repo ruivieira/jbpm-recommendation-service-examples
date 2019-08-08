@@ -8,6 +8,9 @@ import smile.data.Attribute;
 import smile.data.AttributeDataset;
 import smile.data.NominalAttribute;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
 
@@ -23,17 +26,57 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
     private Set<String> outcomeSet = new HashSet<>();
     private final int numAttributes;
 
-    private static final Map<String, AttributeType> buildInputFeatures() {
+    private static Map<String, AttributeType> getInputsConfig() {
+        InputStream inputStream = null;
         final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
+        try {
+            Properties prop = new Properties();
 
-        inputFeaturesConstructor.put("item", AttributeType.NOMINAL);
-        inputFeaturesConstructor.put("ActorId", AttributeType.NOMINAL);
-        inputFeaturesConstructor.put("level", AttributeType.NOMINAL);
+            inputStream = SmileRandomForest.class.getClassLoader().getResourceAsStream("inputs.properties");
+
+            if (inputStream != null) {
+                prop.load(inputStream);
+            } else {
+                throw new FileNotFoundException("Could not find the property file 'inputs.properties' in the classpath.");
+            }
+
+            for (Object propertyName : prop.keySet()) {
+                inputFeaturesConstructor.put((String) propertyName, AttributeType.valueOf(prop.getProperty((String) propertyName)));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
         return inputFeaturesConstructor;
     }
 
+    private static OutputType getOutputsConfig() {
+        InputStream inputStream;
+        OutputType outputType = null;
+        try {
+            Properties prop = new Properties();
+
+            inputStream = SmileRandomForest.class.getClassLoader().getResourceAsStream("output.properties");
+
+            if (inputStream != null) {
+                prop.load(inputStream);
+            } else {
+                throw new FileNotFoundException("Could not find the property file 'output.properties' in the classpath.");
+            }
+
+            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")));
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
+        return outputType;
+    }
+
     public SmileRandomForest() {
-        this(buildInputFeatures(), "approved", AttributeType.NOMINAL);
+        this(getInputsConfig(), getOutputsConfig());
+    }
+
+    public SmileRandomForest(Map<String, AttributeType> inputFeatures, OutputType outputType) {
+        this(inputFeatures, outputType.getName(), outputType.getType());
     }
 
     public SmileRandomForest(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType) {

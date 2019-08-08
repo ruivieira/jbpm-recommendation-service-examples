@@ -23,6 +23,19 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
     private Set<String> outcomeSet = new HashSet<>();
     private final int numAttributes;
 
+    private static final Map<String, AttributeType> buildInputFeatures() {
+        final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
+
+        inputFeaturesConstructor.put("item", AttributeType.NOMINAL);
+        inputFeaturesConstructor.put("ActorId", AttributeType.NOMINAL);
+        inputFeaturesConstructor.put("level", AttributeType.NOMINAL);
+        return inputFeaturesConstructor;
+    }
+
+    public SmileRandomForest() {
+        this(buildInputFeatures(), "approved", AttributeType.NOMINAL);
+    }
+
     public SmileRandomForest(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType) {
         super(inputFeatures, outputFeatureName, outputFeatureType);
         smileAttributes = new HashMap<>();

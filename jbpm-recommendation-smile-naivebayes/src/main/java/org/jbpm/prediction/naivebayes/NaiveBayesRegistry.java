@@ -15,7 +15,6 @@
  */
 
 package org.jbpm.prediction.naivebayes;
-//import org.kie.internal.task.api.prediction.PredictionService;
 
 import org.kie.internal.task.api.prediction.PredictionService;
 

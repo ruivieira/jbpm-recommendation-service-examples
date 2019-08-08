@@ -63,7 +63,7 @@ public class NaiveBayesRecommendationServiceProcessTest extends AbstractKieServi
     @Override
     public DeploymentUnit prepareDeploymentUnit() throws Exception {
         // specify GROUP_ID, ARTIFACT_ID, VERSION of your kjar
-        return createAndDeployUnit("org.jbpm.test.prediction", "random-forest-test", "1.0.0");
+        return createAndDeployUnit("org.jbpm.test.prediction", "naive-bayes-test", "1.0.0");
     }
 
 
@@ -163,27 +163,16 @@ public class NaiveBayesRecommendationServiceProcessTest extends AbstractKieServi
     // evolve when you then keep sending false 
     @Test
     public void test1() {
-        Map<String, Object> outputs;
-        List<Double> oobError = new ArrayList<>();
-        List<Double> posteriors = new ArrayList<>();
+        Map<String, Object> outputs = null;
 
         for (int i = 0 ; i < 17; i++) {
     		outputs = startAndReturnTaskOutputData("test item", "john", 5, true);
-            Double oob = (Double) outputs.get("oob");
-            Double posterior = (Double) outputs.get("confidence");
-            if (oob!=null) oobError.add(oob);
-            if (posterior!=null) posteriors.add(posterior);
-
         }
     	for (int i = 0 ; i < 40; i++) {
     		outputs = startAndReturnTaskOutputData("test item", "john", 5, false);
-            Double oob = (Double) outputs.get("oob");
-            Double posterior = (Double) outputs.get("confidence");
-            if (oob!=null) oobError.add(oob);
-            if (posterior!=null) posteriors.add(posterior);
         }
 
-        final List<Integer> x = IntStream.range(0, oobError.size()).boxed().collect(Collectors.toList());
+        System.out.println(outputs);
 
     }
     

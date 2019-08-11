@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" version="4.4">
+    <Header copyright="Copyright (c) 2018 Software AG" description="Default Description">
+        <Application name="Nyoka" version="3.2.0"/>
+        <Timestamp>2019-07-12 12:57:43.823448</Timestamp>
+    </Header>
+    <MiningBuildTask>
+		<Extension value="Pipeline(memory=None,
+    steps=[('regressor',LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+                   intercept_scaling=1, l1_ratio=None, max_iter=100,
+                   multi_class='warn', n_jobs=None, penalty='l2',
+                   random_state=None, solver='warn', tol=0.0001, verbose=0,
+                   warm_start=False))])"/>
+    </MiningBuildTask>
+    <DataDictionary numberOfFields="3">
+        <DataField name="ActorId" optype="continuous" dataType="double"/>
+        <DataField name="level" optype="continuous" dataType="double"/>
+        <DataField name="approved" optype="categorical" dataType="integer">
+            <Value value="0"/>
+            <Value value="1"/>
+        </DataField>
+    </DataDictionary>
+    <RegressionModel modelName="LogisticRegression" functionName="classification" normalizationMethod="logit">
+        <MiningSchema>
+            <MiningField name="ActorId" usageType="active" optype="continuous"/>
+            <MiningField name="level" usageType="active" optype="continuous"/>
+            <MiningField name="approved" usageType="target" optype="categorical"/>
+        </MiningSchema>
+        <Output>
+            <OutputField name="probability_0" optype="continuous" dataType="double" feature="probability" value="0"/>
+            <OutputField name="probability_1" optype="continuous" dataType="double" feature="probability" value="1"/>
+            <OutputField name="predicted_approved" optype="categorical" dataType="string" feature="predictedValue"/>
+        </Output>
+        <RegressionTable intercept="-2.2152967918415771" targetCategory="1">
+            <NumericPredictor name="ActorId" exponent="1" coefficient="4.4020108346225593"/>
+            <NumericPredictor name="level" exponent="1" coefficient="0.0000000000000000"/>
+        </RegressionTable>
+        <RegressionTable intercept="0.0" targetCategory="0"/>
+    </RegressionModel>
+</PMML>

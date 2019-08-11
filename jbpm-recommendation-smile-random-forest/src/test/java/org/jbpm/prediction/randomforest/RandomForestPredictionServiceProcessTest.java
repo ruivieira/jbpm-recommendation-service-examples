@@ -88,8 +88,10 @@ public class RandomForestPredictionServiceProcessTest extends AbstractKieService
 
         final List<Integer> x = IntStream.range(0, oobError.size()).boxed().collect(Collectors.toList());
 
-        assertTrue((double) outputs.get("confidence") > 90.0);
-        assertEquals(true, outputs.get("approved"));
+        System.out.println(outputs);
+        System.out.println(outputs.get("confidence"));
+        assertTrue((double) outputs.get("confidence") > 0.9);
+        assertEquals("true", outputs.get("approved"));
     }
 
     // Insert an equal number of true and false samples, making
@@ -118,7 +120,7 @@ public class RandomForestPredictionServiceProcessTest extends AbstractKieService
         final List<Integer> x = IntStream.range(0, oobError.size()).boxed().collect(Collectors.toList());
 
         final double confidence = (double) outputs.get("confidence");
-        assertTrue(confidence < 55.0 && confidence > 45.0);
+        assertTrue(confidence < 0.55 && confidence > 0.45);
     }
 
     // Insert a disproportionate partitioning of true and false samples
@@ -129,34 +131,19 @@ public class RandomForestPredictionServiceProcessTest extends AbstractKieService
     public void testUnequalProbabilityRandomForestPredictionService() {
 
         Map<String, Object> outputs;
-        List<Double> oobError = new ArrayList<>();
-        List<Double> posteriors = new ArrayList<>();
 
 
         outputs = startAndReturnTaskOutputData("test item", "john", 5, true);
         for (int i = 0 ; i < 10; i++) {
             outputs = startAndReturnTaskOutputData("test item", "john", 5, false);
-            Double oob = (Double) outputs.get("oob");
-            Double posterior = (Double) outputs.get("confidence");
-            if (oob!=null) oobError.add(oob);
-            if (posterior!=null) posteriors.add(posterior);
         }
         for (int i = 0 ; i < 90; i++) {
-            Map<String, Object> o = startAndReturnTaskOutputData("test item", "john" , 5, true);
-            if (o != null) { // the training hasn't stopped yet
-                outputs = o;
-            }
-            Double oob = (Double) outputs.get("oob");
-            Double posterior = (Double) outputs.get("confidence");
-            if (oob!=null) oobError.add(oob);
-            if (posterior!=null) posteriors.add(posterior);
-
+            outputs = startAndReturnTaskOutputData("test item", "john" , 5, true);
         }
 
-        final List<Integer> x = IntStream.range(0, oobError.size()).boxed().collect(Collectors.toList());
 
-        assertTrue((double) outputs.get("confidence") > 85.0);
-        assertEquals(true, outputs.get("approved"));
+        assertTrue((double) outputs.get("confidence") > 0.85);
+        assertEquals("true", outputs.get("approved"));
     }
 
     // shows how after testing with a mixed set (3x false, 17x true) how prediction (and probability)

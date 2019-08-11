@@ -1,7 +1,5 @@
 package org.jbpm.prediction.naivebayes;
 
-import org.jbpm.prediction.naivebayes.AbstractPredictionEngine;
-import org.jbpm.prediction.naivebayes.AttributeType;
 import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.prediction.PredictionOutcome;
 import org.kie.internal.task.api.prediction.PredictionService;
@@ -10,6 +8,8 @@ import smile.data.Attribute;
 import smile.data.AttributeDataset;
 import smile.data.NominalAttribute;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
 
@@ -24,6 +24,59 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
     private NaiveBayes model = null;
     private Set<String> outcomeSet = new HashSet<>();
     private final int numAttributes;
+
+    private static Map<String, AttributeType> getInputsConfig() {
+        InputStream inputStream = null;
+        final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
+        try {
+            Properties prop = new Properties();
+
+            inputStream = SmileNaiveBayes.class.getClassLoader().getResourceAsStream("inputs.properties");
+
+            if (inputStream != null) {
+                prop.load(inputStream);
+            } else {
+                throw new FileNotFoundException("Could not find the property file 'inputs.properties' in the classpath.");
+            }
+
+            for (Object propertyName : prop.keySet()) {
+                inputFeaturesConstructor.put((String) propertyName, AttributeType.valueOf(prop.getProperty((String) propertyName)));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
+        return inputFeaturesConstructor;
+    }
+
+    private static OutputType getOutputsConfig() {
+        InputStream inputStream;
+        OutputType outputType = null;
+        try {
+            Properties prop = new Properties();
+
+            inputStream = SmileNaiveBayes.class.getClassLoader().getResourceAsStream("output.properties");
+
+            if (inputStream != null) {
+                prop.load(inputStream);
+            } else {
+                throw new FileNotFoundException("Could not find the property file 'output.properties' in the classpath.");
+            }
+
+            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")));
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
+        return outputType;
+    }
+
+    public SmileNaiveBayes() {
+        this(getInputsConfig(), getOutputsConfig());
+    }
+
+    public SmileNaiveBayes(Map<String, AttributeType> inputFeatures, OutputType outputType) {
+        this(inputFeatures, outputType.getName(), outputType.getType());
+    }
 
     public SmileNaiveBayes(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType) {
         super(inputFeatures, outputFeatureName, outputFeatureType);
@@ -72,10 +125,6 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
     }
 
 
-    public void train(Map<String, Object> inputData, Map<String, Object> outputData) {
-        addData(inputData, outputData.get(outcomeAttribute.getName()));
-    }
-
     protected double[] buildFeatures(Map<String, Object> data) {
         final double[] features = new double[numAttributes];
         for (int i = 0 ; i < numAttributes ; i++) {
@@ -90,10 +139,15 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
     }
 
 
-    public PredictionOutcome predict(Map<String, Object> data) {
+    @Override
+    public String getIdentifier() {
+        return IDENTIFIER;
+    }
+
+    @Override
+    public PredictionOutcome predict(Task task, Map<String, Object> inputData) {
         Map<String, Object> outcomes = new HashMap<>();
         if (outcomeSet.size() >= 2) {
-//            model = new RandomForest(dataset, 100);
             model = new NaiveBayes(NaiveBayes.Model.POLYAURN, outcomeSet.size(), attributeNames.size());
 
             int[] y = new int[dataset.size()];
@@ -103,7 +157,7 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
             }
 
             model.learn(dataset.x(), y);
-            final double[] features = buildFeatures(data);
+            final double[] features = buildFeatures(inputData);
             final double[] posteriori = new double[outcomeSet.size()];
             double prediction = model.predict(features, posteriori);
 
@@ -115,7 +169,7 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
 
                 outcomes.put("confidence", confidence);
 
-                System.out.println(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
+                System.out.println(inputData + ", prediction = " + predictionStr + ", confidence = " + confidence);
 
                 return new PredictionOutcome(0.0, 100.0, outcomes);
             } else {
@@ -128,17 +182,7 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
     }
 
     @Override
-    public String getIdentifier() {
-        return null;
-    }
-
-    @Override
-    public PredictionOutcome predict(Task task, Map<String, Object> inputData) {
-        return null;
-    }
-
-    @Override
     public void train(Task task, Map<String, Object> inputData, Map<String, Object> outputData) {
-
+        addData(inputData, outputData.get(outcomeAttribute.getName()));
     }
 }

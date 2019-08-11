@@ -168,7 +168,6 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
         return features;
     }
 
-
     /**
      * Returns the service's identifier
      * @return The service identifier

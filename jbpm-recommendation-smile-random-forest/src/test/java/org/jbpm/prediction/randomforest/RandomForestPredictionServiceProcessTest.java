@@ -16,11 +16,6 @@
 
 package org.jbpm.prediction.randomforest;
 
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.test.services.AbstractKieServicesTest;
 import org.junit.After;
@@ -29,6 +24,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.QueryFilter;
+
+import java.util.*;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 

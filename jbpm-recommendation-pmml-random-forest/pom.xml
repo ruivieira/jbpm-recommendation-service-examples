@@ -8,7 +8,7 @@
     <version>7.15.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jbpm-recommendation-smile-pmml-random-forest</artifactId>
+  <artifactId>jbpm-recommendation-pmml-random-forest</artifactId>
 
   <name>jBPM :: Prediction :: PMML random Forest based prediction service</name>
   <description>PMML random Forest based prediction service</description>

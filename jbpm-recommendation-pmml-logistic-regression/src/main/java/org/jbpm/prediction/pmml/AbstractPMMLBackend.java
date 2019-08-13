@@ -56,7 +56,6 @@ public abstract class AbstractPMMLBackend extends AbstractPredictionEngine imple
             FieldName inputName = inputField.getName();
             Object rawValue;
 
-            // TODO: Automatically categorise features, remove hard-coding
             if (inputName.getValue().equals("ActorId")) {
 
                 String strValue = (String) data.get(inputName.getValue());

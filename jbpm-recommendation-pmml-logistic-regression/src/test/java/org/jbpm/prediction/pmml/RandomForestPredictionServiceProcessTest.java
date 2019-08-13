@@ -18,7 +18,6 @@ package org.jbpm.prediction.pmml;
 
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.test.services.AbstractKieServicesTest;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +31,7 @@ import static org.junit.Assert.*;
 
 public class RandomForestPredictionServiceProcessTest extends AbstractKieServicesTest {
 
-    private Logger logger = Logger.getLogger(RandomForestPredictionServiceProcessTest.class.getName());
+    private Logger LOGGER = Logger.getLogger(RandomForestPredictionServiceProcessTest.class.getName());
 
     private List<Long> instances = new ArrayList<>();
     
@@ -44,11 +43,6 @@ public class RandomForestPredictionServiceProcessTest extends AbstractKieService
     @AfterClass
     public static void cleanOnce() {
         System.clearProperty("org.jbpm.task.prediction.service");
-    }
-    
-    @After
-    public void abortInstances() {
-        //instances.forEach(processInstanceId -> processService.abortProcessInstance(processInstanceId));
     }
     
     @Override

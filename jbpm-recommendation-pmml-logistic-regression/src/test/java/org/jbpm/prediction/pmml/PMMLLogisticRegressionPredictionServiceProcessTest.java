@@ -30,15 +30,15 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
-public class PMMLRandomForestPredictionServiceProcessTest extends AbstractKieServicesTest {
+public class PMMLLogisticRegressionPredictionServiceProcessTest extends AbstractKieServicesTest {
 
-    private Logger logger = Logger.getLogger(PMMLRandomForestPredictionServiceProcessTest.class.getName());
+    private Logger logger = Logger.getLogger(PMMLLogisticRegressionPredictionServiceProcessTest.class.getName());
 
     private List<Long> instances = new ArrayList<>();
     
     @BeforeClass
     public static void setupOnce() {
-        System.setProperty("org.jbpm.task.prediction.service", PMMLRandomForestBackend.IDENTIFIER);
+        System.setProperty("org.jbpm.task.prediction.service", PMMLLogisticRegressionBackend.IDENTIFIER);
     }
     
     @AfterClass
@@ -64,7 +64,6 @@ public class PMMLRandomForestPredictionServiceProcessTest extends AbstractKieSer
         return createAndDeployUnit("org.jbpm.test.prediction", "random-forest-test", "1.0.0");
     }
 
-
     /**
      * The PMML model was trained with 90% of "john" outcomes as "false"
      * Expect confidence > 0.9 (90.0%) and "approved" to be false.
@@ -78,18 +77,16 @@ public class PMMLRandomForestPredictionServiceProcessTest extends AbstractKieSer
     }
 
     /**
-     * The PMML model was trained with 90% of "mary" outcomes as "true"
-     * Expect confidence > 0.9 (90.0%) and "approved" to be true.
+     * The PMML model was trained with 80% of "mary" outcomes as "true"
+     * Expect confidence > 0.8 (80.0%) and "approved" to be true.
      */
     @Test
     public void testUserMary() {
         Map<String, Object> outputs;
         outputs = startAndReturnTaskOutputData("test item", "mary", 5, false);
-        assertTrue((double) outputs.get("confidence") > 0.9);
+        assertTrue((double) outputs.get("confidence") > 0.8);
         assertEquals("true", outputs.get("approved").toString());
     }
-
-
 
     protected Map<String, Object> startAndReturnTaskOutputData(String item, String userId, Integer level, Boolean approved) {
         Map<String, Object> parameters = new HashMap<>();

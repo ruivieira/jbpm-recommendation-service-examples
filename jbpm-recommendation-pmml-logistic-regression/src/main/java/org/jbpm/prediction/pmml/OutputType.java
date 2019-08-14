@@ -23,10 +23,12 @@ public class OutputType {
 
     private final String name;
     private final AttributeType type;
+    private final double confidenceThreshold;
 
-    private OutputType(String name, AttributeType type) {
+    private OutputType(String name, AttributeType type, double confidenceThreshold) {
         this.name = name;
         this.type = type;
+        this.confidenceThreshold = confidenceThreshold;
     }
 
     /**
@@ -35,8 +37,8 @@ public class OutputType {
      * @param type The type of the output attribute {@link AttributeType}
      * @return An instance of {@link OutputType}
      */
-    public static OutputType create(String name, AttributeType type) {
-        return new OutputType(name, type);
+    public static OutputType create(String name, AttributeType type, double confidenceThreshold) {
+        return new OutputType(name, type, confidenceThreshold);
     }
 
     /**
@@ -53,5 +55,9 @@ public class OutputType {
      */
     public AttributeType getType() {
         return type;
+    }
+
+    public double getConfidenceThreshold() {
+        return confidenceThreshold;
     }
 }

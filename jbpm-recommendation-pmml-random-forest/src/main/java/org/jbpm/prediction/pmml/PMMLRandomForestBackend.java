@@ -57,7 +57,7 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
                 throw new FileNotFoundException("Could not find the property file 'output.properties' in the classpath.");
             }
 
-            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")));
+            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")), Double.parseDouble(prop.getProperty("confidence_threshold")));
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
@@ -91,11 +91,11 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
     }
 
     public PMMLRandomForestBackend(Map<String, AttributeType> inputFeatures, OutputType outputType, File pmmlFile) {
-        this(inputFeatures, outputType.getName(), outputType.getType(), pmmlFile);
+        this(inputFeatures, outputType.getName(), outputType.getType(), outputType.getConfidenceThreshold(), pmmlFile);
     }
 
-    public PMMLRandomForestBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, File pmmlFile) {
-        super(inputFeatures, outputFeatureName, outputFeatureType, pmmlFile);
+    public PMMLRandomForestBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold, File pmmlFile) {
+        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold, pmmlFile);
     }
 
     @Override
@@ -112,10 +112,9 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
 
         Map<String, Object> outcomes = new HashMap<>();
         String predictionStr;
-        Double confidence;
 
         Double prediction = (Double) result.get(outcomeFeatureName);
-        confidence = Math.max(Math.abs(0.0 - prediction), Math.abs(1.0 - prediction));
+        double confidence = Math.max(Math.abs(0.0 - prediction), Math.abs(1.0 - prediction));
         long predictionInt = Math.round(prediction);
 
         if (predictionInt == 0) {
@@ -129,6 +128,6 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
 
         System.out.println(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
 
-        return new PredictionOutcome(confidence, 100, outcomes);
+        return new PredictionOutcome(confidence, this.confidenceThreshold, outcomes);
     }
 }

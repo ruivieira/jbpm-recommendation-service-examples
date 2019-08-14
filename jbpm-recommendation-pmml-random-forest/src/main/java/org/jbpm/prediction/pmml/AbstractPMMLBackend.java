@@ -37,8 +37,8 @@ public abstract class AbstractPMMLBackend extends AbstractPredictionEngine imple
     private final List<? extends TargetField> targetFields;
     protected final List<? extends OutputField> outputFields;
 
-    public AbstractPMMLBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, File pmmlFile) {
-        super(inputFeatures, outputFeatureName, outputFeatureType);
+    public AbstractPMMLBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold, File pmmlFile) {
+        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
 
         Evaluator _evalutator = null;
         try {

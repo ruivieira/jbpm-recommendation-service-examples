@@ -20,7 +20,7 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
      * @return A map of input attributes with the attribute name as key and attribute type as value.
      */
     private static Map<String, AttributeType> getInputsConfig() {
-        InputStream inputStream = null;
+        InputStream inputStream;
         final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
         try {
             Properties prop = new Properties();
@@ -50,17 +50,17 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
             Properties prop = new Properties();
 
             inputStream = PMMLLogisticRegressionBackend.class.getClassLoader().getResourceAsStream("output.properties");
-
             if (inputStream != null) {
                 prop.load(inputStream);
             } else {
                 throw new FileNotFoundException("Could not find the property file 'output.properties' in the classpath.");
             }
 
-            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")));
+            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")), Double.parseDouble(prop.getProperty("confidence_threshold")));
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
+        System.out.println(outputType);
         return outputType;
     }
 
@@ -91,11 +91,11 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
     }
 
     public PMMLLogisticRegressionBackend(Map<String, AttributeType> inputFeatures, OutputType outputType, File pmmlFile) {
-        this(inputFeatures, outputType.getName(), outputType.getType(), pmmlFile);
+        this(inputFeatures, outputType.getName(), outputType.getType(), outputType.getConfidenceThreshold(), pmmlFile);
     }
 
-    public PMMLLogisticRegressionBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, File pmmlFile) {
-        super(inputFeatures, outputFeatureName, outputFeatureType, pmmlFile);
+    public PMMLLogisticRegressionBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold, File pmmlFile) {
+        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold, pmmlFile);
     }
 
     @Override

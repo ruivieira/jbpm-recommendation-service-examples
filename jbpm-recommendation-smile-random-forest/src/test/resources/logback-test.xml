@@ -15,11 +15,9 @@
   
   <logger name="org.jbpm.services.task.wih" level="warn"/>
   <logger name="org.jbpm.services.task.impl" level="info"/>
+  <logger name="org.jbpm.prediction.randomforest" level="debug"/>
   
   <logger name="org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl" level="error" />
-
-  <logger name="org.jbpm.prediction.pmml" level="debug"/>
-
   <root level="warn">
     <appender-ref ref="consoleAppender" />
   </root>

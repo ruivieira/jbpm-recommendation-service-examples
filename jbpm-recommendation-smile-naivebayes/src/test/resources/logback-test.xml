@@ -18,7 +18,7 @@
   
   <logger name="org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl" level="error" />
 
-  <logger name="org.jbpm.prediction.pmml" level="debug"/>
+  <logger name="org.jbpm.prediction.naivebayes.SmileNaiveBayes" level="debug"/>
 
   <root level="warn">
     <appender-ref ref="consoleAppender" />

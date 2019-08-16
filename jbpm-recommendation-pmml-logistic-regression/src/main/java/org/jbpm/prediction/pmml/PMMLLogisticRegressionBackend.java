@@ -2,6 +2,8 @@ package org.jbpm.prediction.pmml;
 
 import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.prediction.PredictionOutcome;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +15,8 @@ import java.util.Properties;
 public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
 
     public static final String IDENTIFIER = "PMMLLogisticRegression";
+
+    private static final Logger logger = LoggerFactory.getLogger(PMMLLogisticRegressionBackend.class);
 
     /**
      * Reads the random forest configuration from properties files.
@@ -38,7 +42,7 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
             }
 
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Exception: " + e);
         }
         return inputFeaturesConstructor;
     }
@@ -58,9 +62,8 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
 
             outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")), Double.parseDouble(prop.getProperty("confidence_threshold")));
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Exception: " + e);
         }
-        System.out.println(outputType);
         return outputType;
     }
 
@@ -80,7 +83,7 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
 
             modelFile = new File(PMMLLogisticRegressionBackend.class.getClassLoader().getResource(prop.getProperty("filename")).getFile());
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Exception: " + e);
         }
         return modelFile;
     }
@@ -107,9 +110,6 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
     public PredictionOutcome predict(Task task, Map<String, Object> data) {
         Map<String, ?> result = evaluate(data);
 
-        System.out.println(result);
-        System.out.println(data.get("ActorId") + ", " + data.get("level") + ": " + result.get(outcomeFeatureName));
-
         Map<String, Object> outcomes = new HashMap<>();
         String predictionStr;
         Object predictionValue = result.get(outcomeFeatureName);
@@ -126,7 +126,7 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
         outcomes.put("approved", predictionStr);
         outcomes.put("confidence", confidence);
 
-        System.out.println(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
+        logger.debug(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
 
         return new PredictionOutcome(confidence, 100, outcomes);
     }

@@ -2,6 +2,8 @@ package org.jbpm.prediction.pmml;
 
 import org.kie.api.task.model.Task;
 import org.kie.internal.task.api.prediction.PredictionOutcome;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,13 +16,15 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
 
     public static final String IDENTIFIER = "PMMLRandomForest";
 
+    private static final Logger logger = LoggerFactory.getLogger(PMMLRandomForestBackend.class);
+
     /**
      * Reads the random forest configuration from properties files.
      * "inputs.properties" should contain the input attribute names as keys and attribute types as values.
      * @return A map of input attributes with the attribute name as key and attribute type as value.
      */
     private static Map<String, AttributeType> getInputsConfig() {
-        InputStream inputStream = null;
+        InputStream inputStream;
         final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
         try {
             Properties prop = new Properties();
@@ -38,7 +42,7 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
             }
 
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Exception: " + e);
         }
         return inputFeaturesConstructor;
     }
@@ -59,7 +63,7 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
 
             outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")), Double.parseDouble(prop.getProperty("confidence_threshold")));
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Exception: " + e);
         }
         return outputType;
     }
@@ -80,7 +84,7 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
 
             modelFile = new File(PMMLRandomForestBackend.class.getClassLoader().getResource(prop.getProperty("filename")).getFile());
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Exception: " + e);
         }
         return modelFile;
     }
@@ -107,9 +111,6 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
     public PredictionOutcome predict(Task task, Map<String, Object> data) {
         Map<String, ?> result = evaluate(data);
 
-        System.out.println(result);
-        System.out.println(data.get("ActorId") + ", " + data.get("level") + ": " + result.get(outcomeFeatureName));
-
         Map<String, Object> outcomes = new HashMap<>();
         String predictionStr;
 
@@ -126,7 +127,7 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
         outcomes.put("approved", Boolean.valueOf(predictionStr));
         outcomes.put("confidence", confidence);
 
-        System.out.println(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
+        logger.debug(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
 
         return new PredictionOutcome(confidence, this.confidenceThreshold, outcomes);
     }

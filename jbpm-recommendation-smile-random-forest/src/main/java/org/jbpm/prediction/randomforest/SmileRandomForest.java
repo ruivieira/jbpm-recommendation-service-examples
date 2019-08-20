@@ -30,7 +30,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
-
+/**
+ * Implements AbstractPMMLBackend for a smile random forest model
+ */
 public class SmileRandomForest extends AbstractPredictionEngine implements PredictionService {
 
     private static final Logger logger = LoggerFactory.getLogger(SmileRandomForest.class);
@@ -73,7 +75,10 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
         }
         return inputFeaturesConstructor;
     }
-
+    /**
+     * Returns the properties from the config file in resources/output.properties
+     * @return
+     */
     private static OutputType getOutputsConfig() {
         InputStream inputStream;
         OutputType outputType = null;

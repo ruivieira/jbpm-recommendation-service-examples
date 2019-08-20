@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-
+/**
+ * Register the random forest service
+ */
 public class RandomForestRegistry {
     private static final ServiceLoader<PredictionService> foundServices = ServiceLoader.load(PredictionService.class, RandomForestRegistry.class.getClassLoader());
     private String selectedService = System.getProperty("org.jbpm.prediction.randomforest", SmileRandomForest.IDENTIFIER);

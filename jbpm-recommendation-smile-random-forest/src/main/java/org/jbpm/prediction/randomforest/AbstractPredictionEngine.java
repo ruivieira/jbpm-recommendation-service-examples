@@ -17,7 +17,10 @@
 package org.jbpm.prediction.randomforest;
 
 import java.util.Map;
-
+/**
+ * Abstract class for prediction engine needs extended dependent on
+ * the model being implemented
+ */
 abstract public class AbstractPredictionEngine {
 
     protected Map<String, AttributeType> inputFeatures;

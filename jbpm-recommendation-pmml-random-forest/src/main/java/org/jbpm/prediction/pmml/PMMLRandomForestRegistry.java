@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-
+/**
+ * Register the random forest service
+ */
 public class PMMLRandomForestRegistry {
     private static final ServiceLoader<PredictionService> foundServices = ServiceLoader.load(PredictionService.class, PMMLRandomForestRegistry.class.getClassLoader());
     private String selectedService = System.getProperty("org.jbpm.prediction.pmml", PMMLRandomForestBackend.IDENTIFIER);

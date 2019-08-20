@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Implements AbstractPMMLBackend for a random forest model
+ */
 public class PMMLRandomForestBackend extends AbstractPMMLBackend {
 
     public static final String IDENTIFIER = "PMMLRandomForest";
@@ -47,6 +50,10 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
         return inputFeaturesConstructor;
     }
 
+    /**
+     * Returns the properties from the config file in resources/output.properties
+     * @return
+     */
     private static OutputType getOutputsConfig() {
         InputStream inputStream;
         OutputType outputType = null;
@@ -68,6 +75,10 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
         return outputType;
     }
 
+    /**
+     * Returns the properties in the model file resources/model.properties
+     * @return
+     */
     private static File getModelFile() {
         InputStream inputStream;
         File modelFile = null;
@@ -107,6 +118,12 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
         return IDENTIFIER;
     }
 
+    /**
+     * Make prediction using the PMML random forest model
+     * @param task
+     * @param data
+     * @return
+     */
     @Override
     public PredictionOutcome predict(Task task, Map<String, Object> data) {
         Map<String, ?> result = evaluate(data);

@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-
+/**
+ * Register the naive bayes service
+ */
 public class NaiveBayesRegistry {
     private static final ServiceLoader<PredictionService> foundServices = ServiceLoader.load(PredictionService.class, NaiveBayesRegistry.class.getClassLoader());
     private String selectedService = System.getProperty("org.jbpm.prediction.naivebayes", SmileNaiveBayes.IDENTIFIER);

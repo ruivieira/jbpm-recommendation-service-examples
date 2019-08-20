@@ -31,6 +31,9 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
 
+/**
+ * Implements AbstractPMMLBackend for a smile naives bayes model
+ */
 public class SmileNaiveBayes extends AbstractPredictionEngine implements PredictionService {
 
     public static final String IDENTIFIER = "SMILENaiveBayes";
@@ -74,6 +77,10 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
         return inputFeaturesConstructor;
     }
 
+    /**
+     * Returns the properties from the config file in resources/output.properties
+     * @return
+     */
     private static OutputType getOutputsConfig() {
         InputStream inputStream;
         OutputType outputType = null;
@@ -95,6 +102,9 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
         return outputType;
     }
 
+    /**
+     * Default constructor
+     */
     public SmileNaiveBayes() {
         this(getInputsConfig(), getOutputsConfig());
     }

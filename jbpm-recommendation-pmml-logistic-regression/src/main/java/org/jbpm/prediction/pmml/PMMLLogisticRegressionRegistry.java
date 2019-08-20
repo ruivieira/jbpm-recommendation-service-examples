@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-
+/**
+ * Register the logistic regression service
+ */
 public class PMMLLogisticRegressionRegistry {
     private static final ServiceLoader<PredictionService> foundServices = ServiceLoader.load(PredictionService.class, PMMLLogisticRegressionRegistry.class.getClassLoader());
     private String selectedService = System.getProperty("org.jbpm.prediction.pmml", PMMLLogisticRegressionBackend.IDENTIFIER);

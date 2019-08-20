@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Implementation of the AbstractPMML backend for a logisitc regression model
+ */
 public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
 
     public static final String IDENTIFIER = "PMMLLogisticRegression";

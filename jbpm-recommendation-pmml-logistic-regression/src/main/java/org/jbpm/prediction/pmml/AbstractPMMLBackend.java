@@ -14,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * An abstract class for PMML backend so any implementation of a PMML model will extend this
+ */
 public abstract class AbstractPMMLBackend extends AbstractPredictionEngine implements PredictionService {
 
     private final Evaluator evaluator;
@@ -21,6 +24,14 @@ public abstract class AbstractPMMLBackend extends AbstractPredictionEngine imple
     private final List<? extends TargetField> targetFields;
     protected final List<? extends OutputField> outputFields;
 
+    /**
+     *
+     * @param inputFeatures
+     * @param outputFeatureName
+     * @param outputFeatureType
+     * @param confidenceThreshold
+     * @param pmmlFile
+     */
     public AbstractPMMLBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold, File pmmlFile) {
         super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
 
@@ -43,11 +54,22 @@ public abstract class AbstractPMMLBackend extends AbstractPredictionEngine imple
         this.outputFields = evaluator.getOutputFields();
     }
 
+    /**
+     * Train a model
+     * @param task
+     * @param inputData
+     * @param outputData
+     */
     @Override
     public void train(Task task, Map<String, Object> inputData, Map<String, Object> outputData) {
 
     }
 
+    /**
+     * Evaluate the accuracy of the model
+     * @param data
+     * @return
+     */
     protected Map<String, ?> evaluate(Map<String, Object> data) {
         Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
 
@@ -55,8 +77,6 @@ public abstract class AbstractPMMLBackend extends AbstractPredictionEngine imple
 
             FieldName inputName = inputField.getName();
             Object rawValue;
-
-            // TODO: Automatically categorise features, remove hard-coding
             if (inputName.getValue().equals("ActorId")) {
 
                 String strValue = (String) data.get(inputName.getValue());

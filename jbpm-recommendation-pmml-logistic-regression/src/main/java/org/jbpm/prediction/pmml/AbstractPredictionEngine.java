@@ -18,6 +18,10 @@ package org.jbpm.prediction.pmml;
 
 import java.util.Map;
 
+/**
+ * Abstract class for prediction engine needs extended dependent on
+ * the model being implemented
+ */
 abstract public class AbstractPredictionEngine {
 
     protected Map<String, AttributeType> inputFeatures;
@@ -25,6 +29,13 @@ abstract public class AbstractPredictionEngine {
     protected AttributeType outcomeFeatureType;
     protected double confidenceThreshold;
 
+    /**
+     * Constructor to initialise a Prediction engine
+     * @param inputFeatures
+     * @param outputFeatureName
+     * @param outputFeatureType
+     * @param confidenceThreshold
+     */
     public AbstractPredictionEngine(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold) {
         this.inputFeatures = inputFeatures;
         this.outcomeFeatureName = outputFeatureName;

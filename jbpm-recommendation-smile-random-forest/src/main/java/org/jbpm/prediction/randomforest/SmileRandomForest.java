@@ -22,9 +22,7 @@ import org.kie.internal.task.api.prediction.PredictionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smile.classification.RandomForest;
-import smile.data.Attribute;
-import smile.data.AttributeDataset;
-import smile.data.NominalAttribute;
+import smile.data.*;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -44,15 +42,19 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
     private RandomForest model = null;
     private Set<String> outcomeSet = new HashSet<>();
     private final int numAttributes;
+    private final int numberTrees;
 
     /**
      * Reads the random forest configuration from properties files.
      * "inputs.properties" should contain the input attribute names as keys and attribute types as values.
      * @return A map of input attributes with the attribute name as key and attribute type as value.
      */
-    private static Map<String, AttributeType> getInputsConfig() {
+    private static RandomForestConfiguration readConfigurationFromFile() {
+
+        final RandomForestConfiguration configuration = new RandomForestConfiguration();
+
         InputStream inputStream = null;
-        final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
+        final Map<String, AttributeType> inputFeatures = new HashMap<>();
         try {
             Properties prop = new Properties();
 
@@ -65,18 +67,14 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
             }
 
             for (Object propertyName : prop.keySet()) {
-                inputFeaturesConstructor.put((String) propertyName, AttributeType.valueOf(prop.getProperty((String) propertyName)));
+                inputFeatures.put((String) propertyName, AttributeType.valueOf(prop.getProperty((String) propertyName)));
             }
 
         } catch (Exception e) {
             logger.error("Exception: " + e);
         }
-        return inputFeaturesConstructor;
-    }
+        configuration.setInputFeatures(inputFeatures);
 
-    private static OutputType getOutputsConfig() {
-        InputStream inputStream;
-        OutputType outputType = null;
         try {
             Properties prop = new Properties();
 
@@ -88,41 +86,54 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
                 throw new FileNotFoundException("Could not find the property file 'output.properties' in the classpath.");
             }
 
-            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")), Double.parseDouble(prop.getProperty("confidence_threshold")));
+            configuration.setOutcomeName(prop.getProperty("name"));
+            configuration.setOutcomeType(AttributeType.valueOf(prop.getProperty("type")));
+            configuration.setConfidenceThreshold(Double.parseDouble(prop.getProperty("confidence_threshold")));
+            configuration.setNumTrees(Integer.parseInt(prop.getProperty("num_trees")));
         } catch (Exception e) {
             logger.error("Exception: " + e);
         }
-        return outputType;
+        return configuration;
+    }
+
+    private static Attribute createAttribute(String name, AttributeType type) {
+        if (type == AttributeType.NOMINAL) {
+            return new NominalAttribute(name);
+        } else if (type == AttributeType.NUMERIC) {
+            return new NumericAttribute(name);
+        } else {
+            return new StringAttribute(name);
+        }
     }
 
     public SmileRandomForest() {
-        this(getInputsConfig(), getOutputsConfig());
+        this(readConfigurationFromFile());
     }
 
-    public SmileRandomForest(Map<String, AttributeType> inputFeatures, OutputType outputType) {
-        this(inputFeatures, outputType.getName(), outputType.getType(), outputType.getConfidenceThreshold());
+    public SmileRandomForest(RandomForestConfiguration configuration) {
+        this(configuration.getInputFeatures(),
+                configuration.getOutcomeName(),
+                configuration.getOutcomeType(),
+                configuration.getConfidenceThreshold(),
+                configuration.getNumTrees());
     }
 
-    public SmileRandomForest(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold) {
+    public SmileRandomForest(Map<String, AttributeType> inputFeatures,
+                             String outputFeatureName,
+                             AttributeType outputFeatureType,
+                             double confidenceThreshold,
+                             int numberTrees) {
         super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
+        this.numberTrees = numberTrees;
         smileAttributes = new HashMap<>();
         for (Map.Entry<String, AttributeType> inputFeature : inputFeatures.entrySet()) {
             final String name = inputFeature.getKey();
             final AttributeType type = inputFeature.getValue();
-            if (type == AttributeType.NOMINAL) {
-                smileAttributes.put(name, new NominalAttribute(name));
-                attributeNames.add(name);
-            }
+            smileAttributes.put(name, createAttribute(name, type));
+            attributeNames.add(name);
         }
         numAttributes = smileAttributes.size();
-
-        if (outputFeatureType == AttributeType.NOMINAL) {
-            outcomeAttribute = new NominalAttribute(outputFeatureName);
-        } else {
-            // only dealing with nominal features at the moment
-            outcomeAttribute = new NominalAttribute(outputFeatureName);
-        }
-
+        outcomeAttribute = createAttribute(outputFeatureName, outputFeatureType);
         dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
     }
 
@@ -188,7 +199,7 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
     public PredictionOutcome predict(Task task, Map<String, Object> inputData) {
         Map<String, Object> outcomes = new HashMap<>();
         if (outcomeSet.size() >= 2) {
-            model = new RandomForest(dataset, 100);
+            model = new RandomForest(dataset, this.numberTrees);
             final double[] features = buildFeatures(inputData);
             final double[] posteriori = new double[outcomeSet.size()];
             double prediction = model.predict(features, posteriori);

@@ -16,45 +16,43 @@
 
 package org.jbpm.prediction.randomforest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Encapsulates the model's output information.
  */
-public class OutputType {
+public class RandomForestConfiguration {
 
-    private final String name;
-    private final AttributeType type;
-    private final double confidenceThreshold;
+    private String outcomeName;
+    private AttributeType outcomeType;
+    private double confidenceThreshold;
 
-    private OutputType(String name, AttributeType type, double confidenceThreshold) {
-        this.name = name;
-        this.type = type;
-        this.confidenceThreshold = confidenceThreshold;
+    public int getNumTrees() {
+        return numTrees;
     }
 
-    /**
-     * Create an instance of {@link OutputType}
-     * @param name The name of the output attribute
-     * @param type The type of the output attribute {@link AttributeType}
-     * @return An instance of {@link OutputType}
-     */
-    public static OutputType create(String name, AttributeType type, double confidenceThreshold) {
-        return new OutputType(name, type, confidenceThreshold);
+    public void setNumTrees(int numTrees) {
+        this.numTrees = numTrees;
     }
+
+    private int numTrees;
+    private Map<String, AttributeType> inputFeatures = new HashMap<>();
 
     /**
      * Returns the name of the output attribute
      * @return The name of the output attribute
      */
-    public String getName() {
-        return name;
+    public String getOutcomeName() {
+        return outcomeName;
     }
 
     /**
      * Returns the type of the output attribute {@link AttributeType}
      * @return The type of the output attribute
      */
-    public AttributeType getType() {
-        return type;
+    public AttributeType getOutcomeType() {
+        return outcomeType;
     }
 
     /**
@@ -64,5 +62,25 @@ public class OutputType {
      */
     public double getConfidenceThreshold() {
         return confidenceThreshold;
+    }
+
+    public Map<String, AttributeType> getInputFeatures() {
+        return inputFeatures;
+    }
+
+    public void setInputFeatures(Map<String, AttributeType> inputFeatures) {
+        this.inputFeatures = inputFeatures;
+    }
+
+    public void setOutcomeName(String outcomeName) {
+        this.outcomeName = outcomeName;
+    }
+
+    public void setOutcomeType(AttributeType outcomeType) {
+        this.outcomeType = outcomeType;
+    }
+
+    public void setConfidenceThreshold(double confidenceThreshold) {
+        this.confidenceThreshold = confidenceThreshold;
     }
 }

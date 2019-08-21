@@ -27,6 +27,8 @@ public class RandomForestConfiguration {
     private String outcomeName;
     private AttributeType outcomeType;
     private double confidenceThreshold;
+    private int numTrees;
+    private Map<String, AttributeType> inputFeatures = new HashMap<>();
 
     public int getNumTrees() {
         return numTrees;
@@ -36,23 +38,30 @@ public class RandomForestConfiguration {
         this.numTrees = numTrees;
     }
 
-    private int numTrees;
-    private Map<String, AttributeType> inputFeatures = new HashMap<>();
-
     /**
      * Returns the name of the output attribute
+     *
      * @return The name of the output attribute
      */
     public String getOutcomeName() {
         return outcomeName;
     }
 
+    public void setOutcomeName(String outcomeName) {
+        this.outcomeName = outcomeName;
+    }
+
     /**
      * Returns the type of the output attribute {@link AttributeType}
+     *
      * @return The type of the output attribute
      */
     public AttributeType getOutcomeType() {
         return outcomeType;
+    }
+
+    public void setOutcomeType(AttributeType outcomeType) {
+        this.outcomeType = outcomeType;
     }
 
     /**
@@ -64,23 +73,15 @@ public class RandomForestConfiguration {
         return confidenceThreshold;
     }
 
+    public void setConfidenceThreshold(double confidenceThreshold) {
+        this.confidenceThreshold = confidenceThreshold;
+    }
+
     public Map<String, AttributeType> getInputFeatures() {
         return inputFeatures;
     }
 
     public void setInputFeatures(Map<String, AttributeType> inputFeatures) {
         this.inputFeatures = inputFeatures;
-    }
-
-    public void setOutcomeName(String outcomeName) {
-        this.outcomeName = outcomeName;
-    }
-
-    public void setOutcomeType(AttributeType outcomeType) {
-        this.outcomeType = outcomeType;
-    }
-
-    public void setConfidenceThreshold(double confidenceThreshold) {
-        this.confidenceThreshold = confidenceThreshold;
     }
 }

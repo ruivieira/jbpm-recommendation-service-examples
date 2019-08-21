@@ -31,22 +31,52 @@ import java.util.*;
 
 public class SmileRandomForest extends AbstractPredictionEngine implements PredictionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SmileRandomForest.class);
-
     public static final String IDENTIFIER = "SMILERandomForest";
-
+    private static final Logger logger = LoggerFactory.getLogger(SmileRandomForest.class);
     private final AttributeDataset dataset;
     private final Map<String, Attribute> smileAttributes;
-    protected List<String> attributeNames = new ArrayList<>();
     private final Attribute outcomeAttribute;
-    private RandomForest model = null;
-    private Set<String> outcomeSet = new HashSet<>();
     private final int numAttributes;
     private final int numberTrees;
+    protected List<String> attributeNames = new ArrayList<>();
+    private RandomForest model = null;
+    private Set<String> outcomeSet = new HashSet<>();
+
+    public SmileRandomForest() {
+        this(readConfigurationFromFile());
+    }
+
+    public SmileRandomForest(RandomForestConfiguration configuration) {
+        this(configuration.getInputFeatures(),
+                configuration.getOutcomeName(),
+                configuration.getOutcomeType(),
+                configuration.getConfidenceThreshold(),
+                configuration.getNumTrees());
+    }
+
+    public SmileRandomForest(Map<String, AttributeType> inputFeatures,
+                             String outputFeatureName,
+                             AttributeType outputFeatureType,
+                             double confidenceThreshold,
+                             int numberTrees) {
+        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
+        this.numberTrees = numberTrees;
+        smileAttributes = new HashMap<>();
+        for (Map.Entry<String, AttributeType> inputFeature : inputFeatures.entrySet()) {
+            final String name = inputFeature.getKey();
+            final AttributeType type = inputFeature.getValue();
+            smileAttributes.put(name, createAttribute(name, type));
+            attributeNames.add(name);
+        }
+        numAttributes = smileAttributes.size();
+        outcomeAttribute = createAttribute(outputFeatureName, outputFeatureType);
+        dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
+    }
 
     /**
      * Reads the random forest configuration from properties files.
      * "inputs.properties" should contain the input attribute names as keys and attribute types as values.
+     *
      * @return A map of input attributes with the attribute name as key and attribute type as value.
      */
     private static RandomForestConfiguration readConfigurationFromFile() {
@@ -106,40 +136,10 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
         }
     }
 
-    public SmileRandomForest() {
-        this(readConfigurationFromFile());
-    }
-
-    public SmileRandomForest(RandomForestConfiguration configuration) {
-        this(configuration.getInputFeatures(),
-                configuration.getOutcomeName(),
-                configuration.getOutcomeType(),
-                configuration.getConfidenceThreshold(),
-                configuration.getNumTrees());
-    }
-
-    public SmileRandomForest(Map<String, AttributeType> inputFeatures,
-                             String outputFeatureName,
-                             AttributeType outputFeatureType,
-                             double confidenceThreshold,
-                             int numberTrees) {
-        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
-        this.numberTrees = numberTrees;
-        smileAttributes = new HashMap<>();
-        for (Map.Entry<String, AttributeType> inputFeature : inputFeatures.entrySet()) {
-            final String name = inputFeature.getKey();
-            final AttributeType type = inputFeature.getValue();
-            smileAttributes.put(name, createAttribute(name, type));
-            attributeNames.add(name);
-        }
-        numAttributes = smileAttributes.size();
-        outcomeAttribute = createAttribute(outputFeatureName, outputFeatureType);
-        dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
-    }
-
     /**
      * Add the data provided as a map to a Smile {@link smile.data.Dataset}.
-     * @param data A map containing the input attribute names as keys and the attribute values as values.
+     *
+     * @param data    A map containing the input attribute names as keys and the attribute values as values.
      * @param outcome The value of the outcome (output data).
      */
     public void addData(Map<String, Object> data, Object outcome) {
@@ -164,12 +164,13 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
 
     /**
      * Build a set of features compatible with Smile's datasets from the map of input data
+     *
      * @param data A map containing the input attribute names as keys and the attribute values as values.
      * @return A feature vector as a array of doubles.
      */
     protected double[] buildFeatures(Map<String, Object> data) {
         final double[] features = new double[numAttributes];
-        for (int i = 0 ; i < numAttributes ; i++) {
+        for (int i = 0; i < numAttributes; i++) {
             final String attrName = attributeNames.get(i);
             try {
                 features[i] = smileAttributes.get(attrName).valueOf(data.get(attrName).toString());
@@ -182,6 +183,7 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
 
     /**
      * Returns the service's identifier
+     *
      * @return The service identifier
      */
     @Override
@@ -191,7 +193,8 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
 
     /**
      * Returns a model prediction given the input data
-     * @param task Human task data
+     *
+     * @param task      Human task data
      * @param inputData A map containing the input attribute names as keys and the attribute values as values.
      * @return A {@link PredictionOutcome} containing the model's prediction for the input data.
      */
@@ -219,8 +222,9 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
 
     /**
      * Train the random forest model using data from the human task.
-     * @param task Human task data
-     * @param inputData A map containing the input attribute names as keys and the attribute values as values.
+     *
+     * @param task       Human task data
+     * @param inputData  A map containing the input attribute names as keys and the attribute values as values.
      * @param outputData A map containing the output attribute names as keys and the attribute values as values.
      */
     @Override

@@ -33,6 +33,7 @@ public class RandomForestRegistry {
         foundServices
                 .forEach(strategy -> predictionServices.put(strategy.getIdentifier(), strategy));
     }
+
     public static RandomForestRegistry get() {
         return Holder.INSTANCE;
     }
@@ -46,12 +47,12 @@ public class RandomForestRegistry {
         return predictionService;
     }
 
-    private static class Holder {
-        static final RandomForestRegistry INSTANCE = new RandomForestRegistry();
-    }
-
     public synchronized void addStrategy(SmileRandomForest predictionService) {
         this.predictionServices.put(predictionService.getIdentifier(), predictionService);
 
+    }
+
+    private static class Holder {
+        static final RandomForestRegistry INSTANCE = new RandomForestRegistry();
     }
 }

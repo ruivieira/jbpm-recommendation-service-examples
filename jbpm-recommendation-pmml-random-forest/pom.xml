@@ -10,6 +10,10 @@
 
   <artifactId>jbpm-recommendation-pmml-random-forest</artifactId>
 
+  <properties>
+    <pmml-version>1.4.11</pmml-version>
+  </properties>
+
   <name>jBPM :: Prediction :: PMML random Forest based prediction service</name>
   <description>PMML random Forest based prediction service</description>
 
@@ -76,15 +80,18 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!--    PMML dependencies-->
+
     <dependency>
       <groupId>org.jpmml</groupId>
       <artifactId>pmml-evaluator</artifactId>
-      <version>1.4.11</version>
+      <version>${pmml-version}</version>
     </dependency>
     <dependency>
       <groupId>org.jpmml</groupId>
       <artifactId>pmml-evaluator-extension</artifactId>
-      <version>1.4.11</version>
+      <version>${pmml-version}</version>
     </dependency>
 
   </dependencies>

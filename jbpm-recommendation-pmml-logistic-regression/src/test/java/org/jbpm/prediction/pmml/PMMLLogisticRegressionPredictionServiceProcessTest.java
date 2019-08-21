@@ -61,7 +61,7 @@ public class PMMLLogisticRegressionPredictionServiceProcessTest extends Abstract
     @Override
     public DeploymentUnit prepareDeploymentUnit() throws Exception {
         // specify GROUP_ID, ARTIFACT_ID, VERSION of your kjar
-        return createAndDeployUnit("org.jbpm.test.prediction", "random-forest-test", "1.0.0");
+        return createAndDeployUnit("org.jbpm.test.prediction", "pmml-logistic-regression-test", "1.0.0");
     }
 
     /**

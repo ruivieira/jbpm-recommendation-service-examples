@@ -33,6 +33,7 @@ public class NaiveBayesRegistry {
         foundServices
                 .forEach(strategy -> predictionServices.put(strategy.getIdentifier(), strategy));
     }
+
     public static NaiveBayesRegistry get() {
         return Holder.INSTANCE;
     }

@@ -37,14 +37,40 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
 
     private final AttributeDataset dataset;
     private final Map<String, Attribute> smileAttributes;
-    protected List<String> attributeNames = new ArrayList<>();
     private final Attribute outcomeAttribute;
+    private final int numAttributes;
+    protected List<String> attributeNames = new ArrayList<>();
     private NaiveBayes model = null;
     private Set<String> outcomeSet = new HashSet<>();
-    private final int numAttributes;
+
+    public SmileNaiveBayes() {
+        this(readConfigurationFromFile());
+    }
+
+
+    public SmileNaiveBayes(NaiveBayesConfiguration configuration) {
+        this(configuration.getInputFeatures(),
+                configuration.getOutcomeName(),
+                configuration.getOutcomeType(),
+                configuration.getConfidenceThreshold());
+    }
+
+    public SmileNaiveBayes(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold) {
+        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
+        smileAttributes = new HashMap<>();
+        for (Map.Entry<String, AttributeType> inputFeature : inputFeatures.entrySet()) {
+            final String name = inputFeature.getKey();
+            final AttributeType type = inputFeature.getValue();
+            smileAttributes.put(name, createAttribute(name, type));
+            attributeNames.add(name);
+        }
+        numAttributes = smileAttributes.size();
+        outcomeAttribute = createAttribute(outcomeFeatureName, outputFeatureType);
+        dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
+    }
 
     /**
-     * Reads the random forest configuration from properties files.
+     * Reads the naive bayes configuration from properties files.
      * "inputs.properties" should contain the input attribute names as keys and attribute types as values.
      *
      * @return A map of input attributes with the attribute name as key and attribute type as value.
@@ -95,18 +121,6 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
         return configuration;
     }
 
-
-    public SmileNaiveBayes() {
-        this(readConfigurationFromFile());
-    }
-
-    public SmileNaiveBayes(NaiveBayesConfiguration configuration) {
-        this(configuration.getInputFeatures(),
-                configuration.getOutcomeName(),
-                configuration.getOutcomeType(),
-                configuration.getConfidenceThreshold());
-    }
-
     private static Attribute createAttribute(String name, AttributeType type) {
         if (type == AttributeType.NOMINAL) {
             return new NominalAttribute(name);
@@ -117,23 +131,10 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
         }
     }
 
-    public SmileNaiveBayes(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold) {
-        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
-        smileAttributes = new HashMap<>();
-        for (Map.Entry<String, AttributeType> inputFeature : inputFeatures.entrySet()) {
-            final String name = inputFeature.getKey();
-            final AttributeType type = inputFeature.getValue();
-            smileAttributes.put(name, createAttribute(name, type));
-            attributeNames.add(name);
-        }
-        numAttributes = smileAttributes.size();
-        outcomeAttribute = createAttribute(outcomeFeatureName, outputFeatureType);
-        dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
-    }
-
     /**
      * Add the data provided as a map to a Smile {@link smile.data.Dataset}.
-     * @param data A map containing the input attribute names as keys and the attribute values as values.
+     *
+     * @param data    A map containing the input attribute names as keys and the attribute values as values.
      * @param outcome The value of the outcome (output data).
      */
     public void addData(Map<String, Object> data, Object outcome) {
@@ -158,12 +159,13 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
 
     /**
      * Build a set of features compatible with Smile's datasets from the map of input data
+     *
      * @param data A map containing the input attribute names as keys and the attribute values as values.
      * @return A feature vector as a array of doubles.
      */
     protected double[] buildFeatures(Map<String, Object> data) {
         final double[] features = new double[numAttributes];
-        for (int i = 0 ; i < numAttributes ; i++) {
+        for (int i = 0; i < numAttributes; i++) {
             final String attrName = attributeNames.get(i);
             try {
                 features[i] = smileAttributes.get(attrName).valueOf(data.get(attrName).toString());
@@ -177,6 +179,7 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
 
     /**
      * Returns the service's identifier
+     *
      * @return The service identifier
      */
     @Override
@@ -186,7 +189,8 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
 
     /**
      * Returns a model prediction given the input data
-     * @param task Human task data
+     *
+     * @param task      Human task data
      * @param inputData A map containing the input attribute names as keys and the attribute values as values.
      * @return A {@link PredictionOutcome} containing the model's prediction for the input data.
      */
@@ -197,7 +201,7 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
             model = new NaiveBayes(NaiveBayes.Model.MULTINOMIAL, outcomeSet.size(), attributeNames.size());
 
             int[] y = new int[dataset.size()];
-            for (int i = 0 ; i < dataset.size() ; i++) {
+            for (int i = 0; i < dataset.size(); i++) {
 
                 y[i] = (int) dataset.get(i).y;
             }
@@ -229,8 +233,9 @@ public class SmileNaiveBayes extends AbstractPredictionEngine implements Predict
 
     /**
      * Train the naive bayes model using data from the human task.
-     * @param task Human task data
-     * @param inputData A map containing the input attribute names as keys and the attribute values as values.
+     *
+     * @param task       Human task data
+     * @param inputData  A map containing the input attribute names as keys and the attribute values as values.
      * @param outputData A map containing the output attribute names as keys and the attribute values as values.
      */
     @Override

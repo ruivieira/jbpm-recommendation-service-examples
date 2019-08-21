@@ -21,11 +21,15 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
     /**
      * Reads the random forest configuration from properties files.
      * "inputs.properties" should contain the input attribute names as keys and attribute types as values.
+     *
      * @return A map of input attributes with the attribute name as key and attribute type as value.
      */
-    private static Map<String, AttributeType> getInputsConfig() {
-        InputStream inputStream;
-        final Map<String, AttributeType> inputFeaturesConstructor = new HashMap<>();
+    private static PMMLLogisticRegressionConfiguration readConfigurationFromFile() {
+
+        final PMMLLogisticRegressionConfiguration configuration = new PMMLLogisticRegressionConfiguration();
+
+        InputStream inputStream = null;
+        final Map<String, AttributeType> inputFeatures = new HashMap<>();
         try {
             Properties prop = new Properties();
 
@@ -38,37 +42,31 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
             }
 
             for (Object propertyName : prop.keySet()) {
-                inputFeaturesConstructor.put((String) propertyName, AttributeType.valueOf(prop.getProperty((String) propertyName)));
+                inputFeatures.put((String) propertyName, AttributeType.valueOf(prop.getProperty((String) propertyName)));
             }
 
         } catch (Exception e) {
             logger.error("Exception: " + e);
         }
-        return inputFeaturesConstructor;
-    }
+        configuration.setInputFeatures(inputFeatures);
 
-    private static OutputType getOutputsConfig() {
-        InputStream inputStream;
-        OutputType outputType = null;
         try {
             Properties prop = new Properties();
 
             inputStream = PMMLLogisticRegressionBackend.class.getClassLoader().getResourceAsStream("output.properties");
+
             if (inputStream != null) {
                 prop.load(inputStream);
             } else {
                 throw new FileNotFoundException("Could not find the property file 'output.properties' in the classpath.");
             }
 
-            outputType = OutputType.create(prop.getProperty("name"), AttributeType.valueOf(prop.getProperty("type")), Double.parseDouble(prop.getProperty("confidence_threshold")));
+            configuration.setOutcomeName(prop.getProperty("name"));
+            configuration.setConfidenceThreshold(Double.parseDouble(prop.getProperty("confidence_threshold")));
         } catch (Exception e) {
             logger.error("Exception: " + e);
         }
-        return outputType;
-    }
 
-    private static File getModelFile() {
-        InputStream inputStream;
         File modelFile = null;
         try {
             Properties prop = new Properties();
@@ -81,24 +79,24 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
                 throw new FileNotFoundException("Could not find the property file 'model.properties' in the classpath.");
             }
 
-            modelFile = new File(PMMLLogisticRegressionBackend.class.getClassLoader().getResource(prop.getProperty("filename")).getFile());
+            configuration.setModelFile(new File(PMMLLogisticRegressionBackend.class.getClassLoader().getResource(prop.getProperty("filename")).getFile()));
         } catch (Exception e) {
             logger.error("Exception: " + e);
         }
-        return modelFile;
-    }
 
+        return configuration;
+    }
 
     public PMMLLogisticRegressionBackend() {
-        this(getInputsConfig(), getOutputsConfig(), getModelFile());
+        this(readConfigurationFromFile());
     }
 
-    public PMMLLogisticRegressionBackend(Map<String, AttributeType> inputFeatures, OutputType outputType, File pmmlFile) {
-        this(inputFeatures, outputType.getName(), outputType.getType(), outputType.getConfidenceThreshold(), pmmlFile);
+    public PMMLLogisticRegressionBackend(PMMLLogisticRegressionConfiguration configuration) {
+        this(configuration.getInputFeatures(), configuration.getOutcomeName(), configuration.getConfidenceThreshold(), configuration.getModelFile());
     }
 
-    public PMMLLogisticRegressionBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold, File pmmlFile) {
-        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold, pmmlFile);
+    public PMMLLogisticRegressionBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, double confidenceThreshold, File pmmlFile) {
+        super(inputFeatures, outputFeatureName, confidenceThreshold, pmmlFile);
     }
 
     @Override
@@ -128,6 +126,6 @@ public class PMMLLogisticRegressionBackend extends AbstractPMMLBackend {
 
         logger.debug(data + ", prediction = " + predictionStr + ", confidence = " + confidence);
 
-        return new PredictionOutcome(confidence, 100, outcomes);
+        return new PredictionOutcome(confidence, this.confidenceThreshold, outcomes);
     }
 }

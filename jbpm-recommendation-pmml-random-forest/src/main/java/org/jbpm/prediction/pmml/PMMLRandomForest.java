@@ -33,10 +33,11 @@ public class PMMLRandomForest extends AbstractPMMLBackend {
     private static final Logger logger = LoggerFactory.getLogger(PMMLRandomForest.class);
 
     /**
-     * Reads the random forest configuration from properties files.
-     * "inputs.properties" should contain the input attribute names as keys and attribute types as values.
-     *
-     * @return A map of input attributes with the attribute name as key and attribute type as value.
+     * Reads the PMML model configuration from a properties files.
+     * "inputs.properties" should contain the input attribute names as keys and (optional) attribute types as values
+     * "output.properties" should contain the output attribute name and the confidence threshold
+     * "model.properties" should contain the location of the PMML model
+     * @return A map of input attributes with the attribute name as key and attribute type as value
      */
     private static PMMLRandomForestConfiguration readConfigurationFromFile() {
 
@@ -118,6 +119,13 @@ public class PMMLRandomForest extends AbstractPMMLBackend {
         super(inputFeatures, outputFeatureName, confidenceThreshold, pmmlFile);
     }
 
+    /**
+     * Returns the processed data (e.g. perform categorisation, etc). If no processing is needed, simply return
+     * the original data.
+     *
+     * @param data A map containing the input data, with attribute names as key and values as values.
+     * @return data A map containing the processed data, with attribute names as key and values as values.
+     */
     @Override
     protected Map<String, Object> preProcess(Map<String, Object> data) {
 
@@ -151,6 +159,13 @@ public class PMMLRandomForest extends AbstractPMMLBackend {
         return IDENTIFIER;
     }
 
+    /**
+     * Returns a model prediction given the input data
+     *
+     * @param task Human task data
+     * @param data A map containing the input attribute names as keys and the attribute values as values.
+     * @return A {@link PredictionOutcome} containing the model's prediction for the input data.
+     */
     @Override
     public PredictionOutcome predict(Task task, Map<String, Object> data) {
         Map<String, ?> result = evaluate(data);

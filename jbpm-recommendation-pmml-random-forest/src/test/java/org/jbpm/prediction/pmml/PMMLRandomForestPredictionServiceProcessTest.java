@@ -38,7 +38,7 @@ public class PMMLRandomForestPredictionServiceProcessTest extends AbstractKieSer
     
     @BeforeClass
     public static void setupOnce() {
-        System.setProperty("org.jbpm.task.prediction.service", PMMLRandomForestBackend.IDENTIFIER);
+        System.setProperty("org.jbpm.task.prediction.service", PMMLRandomForest.IDENTIFIER);
     }
     
     @AfterClass

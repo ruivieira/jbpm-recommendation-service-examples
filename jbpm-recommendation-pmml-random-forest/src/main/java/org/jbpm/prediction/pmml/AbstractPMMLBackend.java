@@ -13,15 +13,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractPMMLBackend extends AbstractPredictionEngine implements PredictionService {
+public abstract class AbstractPMMLBackend implements PredictionService {
 
     private final Evaluator evaluator;
     private final List<? extends InputField> inputFields;
     private final List<? extends TargetField> targetFields;
     protected final List<? extends OutputField> outputFields;
 
-    public AbstractPMMLBackend(Map<String, AttributeType> inputFeatures, String outputFeatureName, AttributeType outputFeatureType, double confidenceThreshold, File pmmlFile) {
-        super(inputFeatures, outputFeatureName, outputFeatureType, confidenceThreshold);
+    protected List<String> inputFeatures;
+    protected String outcomeFeatureName;
+    protected double confidenceThreshold;
+
+
+    public AbstractPMMLBackend(List<String> inputFeatures, String outputFeatureName, double confidenceThreshold, File pmmlFile) {
+        this.inputFeatures = inputFeatures;
+        this.outcomeFeatureName = outputFeatureName;
+        this.confidenceThreshold = confidenceThreshold;
+
 
         Evaluator _evalutator = null;
         try {

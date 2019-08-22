@@ -38,7 +38,7 @@ public class PMMLLogisticRegressionPredictionServiceProcessTest extends Abstract
     
     @BeforeClass
     public static void setupOnce() {
-        System.setProperty("org.jbpm.task.prediction.service", PMMLLogisticRegressionBackend.IDENTIFIER);
+        System.setProperty("org.jbpm.task.prediction.service", PMMLLogisticRegression.IDENTIFIER);
     }
     
     @AfterClass

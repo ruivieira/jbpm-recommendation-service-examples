@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Encapsulates the model's output information.
  */
-public class PMMLLogisticRegressionConfiguration {
+public class PMMLRandomForestConfiguration {
 
     private String outcomeName;
     private double confidenceThreshold;

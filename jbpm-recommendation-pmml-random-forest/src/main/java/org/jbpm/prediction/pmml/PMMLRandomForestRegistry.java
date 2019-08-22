@@ -25,7 +25,7 @@ import java.util.ServiceLoader;
 
 public class PMMLRandomForestRegistry {
     private static final ServiceLoader<PredictionService> foundServices = ServiceLoader.load(PredictionService.class, PMMLRandomForestRegistry.class.getClassLoader());
-    private String selectedService = System.getProperty("org.jbpm.prediction.pmml", PMMLRandomForestBackend.IDENTIFIER);
+    private String selectedService = System.getProperty("org.jbpm.prediction.pmml", PMMLRandomForest.IDENTIFIER);
     private Map<String, PredictionService> predictionServices = new HashMap<>();
 
     private PMMLRandomForestRegistry() {
@@ -50,7 +50,7 @@ public class PMMLRandomForestRegistry {
         static final PMMLRandomForestRegistry INSTANCE = new PMMLRandomForestRegistry();
     }
 
-    public synchronized void addStrategy(PMMLRandomForestBackend predictionService) {
+    public synchronized void addStrategy(PMMLRandomForest predictionService) {
         this.predictionServices.put(predictionService.getIdentifier(), predictionService);
 
     }

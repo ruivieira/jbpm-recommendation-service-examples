@@ -25,7 +25,7 @@ import java.util.ServiceLoader;
 
 public class PMMLLogisticRegressionRegistry {
     private static final ServiceLoader<PredictionService> foundServices = ServiceLoader.load(PredictionService.class, PMMLLogisticRegressionRegistry.class.getClassLoader());
-    private String selectedService = System.getProperty("org.jbpm.prediction.pmml", PMMLLogisticRegressionBackend.IDENTIFIER);
+    private String selectedService = System.getProperty("org.jbpm.prediction.pmml", PMMLLogisticRegression.IDENTIFIER);
     private Map<String, PredictionService> predictionServices = new HashMap<>();
 
     private PMMLLogisticRegressionRegistry() {
@@ -50,7 +50,7 @@ public class PMMLLogisticRegressionRegistry {
         static final PMMLLogisticRegressionRegistry INSTANCE = new PMMLLogisticRegressionRegistry();
     }
 
-    public synchronized void addStrategy(PMMLLogisticRegressionBackend predictionService) {
+    public synchronized void addStrategy(PMMLLogisticRegression predictionService) {
         this.predictionServices.put(predictionService.getIdentifier(), predictionService);
 
     }

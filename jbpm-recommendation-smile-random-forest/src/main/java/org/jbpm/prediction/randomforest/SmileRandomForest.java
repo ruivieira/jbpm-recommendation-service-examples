@@ -39,13 +39,13 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
 
     public static final String IDENTIFIER = "SMILERandomForest";
 
-    private final AttributeDataset dataset;
-    private final Map<String, Attribute> smileAttributes;
+    private AttributeDataset dataset;
+    private Map<String, Attribute> smileAttributes;
     protected List<String> attributeNames = new ArrayList<>();
-    private final Attribute outcomeAttribute;
+    private Attribute outcomeAttribute;
     private RandomForest model = null;
     private Set<String> outcomeSet = new HashSet<>();
-    private final int numAttributes;
+    private int numAttributes;
 
     /**
      * Reads the random forest configuration from properties files.
@@ -116,6 +116,13 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
     public SmileRandomForest() {
 
         this(getInputsConfig(), getOutputsConfig());
+        //make input features
+        Map<String, AttributeType> inputFeatures = new HashMap<>();
+        inputFeatures.put("item",AttributeType.NOMINAL);
+        inputFeatures.put("level",AttributeType.NOMINAL);
+        inputFeatures.put("userId",AttributeType.NOMINAL);
+        inputFeatures.put("approved",AttributeType.NOMINAL);
+        initSmileAttrs(inputFeatures);
         train(getInputData(),getOutputData());
         logger.info("trained the smile random forest model");
     }
@@ -146,7 +153,21 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
 
         dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
     }
-
+    public void initSmileAttrs(Map<String, AttributeType> inputFeatures)
+    {
+        smileAttributes = new HashMap<>();
+        for (Map.Entry<String, AttributeType> inputFeature : inputFeatures.entrySet()) {
+            final String name = inputFeature.getKey();
+            final AttributeType type = inputFeature.getValue();
+            if (type == AttributeType.NOMINAL) {
+                smileAttributes.put(name, new NominalAttribute(name));
+                attributeNames.add(name);
+            }
+        }
+        numAttributes = smileAttributes.size();
+        outcomeAttribute = new NominalAttribute("approved");
+        dataset = new AttributeDataset("dataset", smileAttributes.values().toArray(new Attribute[numAttributes]), outcomeAttribute);
+    }
     /**
      * Add the data provided as a map to a Smile {@link smile.data.Dataset}.
      * @param data A map containing the input attribute names as keys and the attribute values as values.
@@ -171,7 +192,22 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
             e.printStackTrace();
         }
     }
-
+    /**
+     * Add the data provided as a map to a Smile {@link smile.data.Dataset}.
+     * @param data A map containing the input attribute names as keys and the attribute values as values.
+     * @param outcome The value of the outcome (output data).
+     */
+    public void addDataForLoader(Map<String, Object> data, Object outcome) {
+        final double[] features = new double[numAttributes];
+        int i = 0;
+        try {
+            final String outcomeStr = outcome.toString();
+            outcomeSet.add(outcomeStr);
+            dataset.add(features, outcomeAttribute.valueOf(outcomeStr));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * Build a set of features compatible with Smile's datasets from the map of input data
      * @param data A map containing the input attribute names as keys and the attribute values as values.
@@ -238,11 +274,11 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
         addData(inputData, outputData.get(outcomeAttribute.getName()));
     }
     /**
-     * Train the random forest model
+     * Train the random forest model for loader
      * @param inputData A map containing the input attribute names as keys and the attribute values as values.
      * @param outputData A map containing the output attribute names as keys and the attribute values as values.
      */
     public void train(Map<String, Object> inputData, Map<String, Object> outputData) {
-        addData(inputData, outputData.get(outcomeAttribute.getName()));
+        addDataForLoader(inputData, outputData.get(outcomeAttribute.getName()));
     }
 }

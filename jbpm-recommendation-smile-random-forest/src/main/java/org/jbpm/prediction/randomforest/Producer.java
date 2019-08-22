@@ -4,6 +4,7 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeploymentUnit;
+import org.jbpm.services.api.utils.KieServiceConfigurator;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.QueryFilter;
 
@@ -18,7 +19,19 @@ public class Producer {
 
     Producer()
     {
-        getInputData();
+
+//        KieServiceConfigurator serviceConfigurator = ServiceLoader.load(KieServiceConfigurator.class).iterator().next();
+//
+//        // build runtime data service
+//        runtimeDataService = serviceConfigurator.getRuntimeDataService();
+//
+//        // build process service
+//        processService = serviceConfigurator.getProcessService();
+//
+//        // build user task service
+//        userTaskService = serviceConfigurator.getUserTaskService();
+//
+//        deploymentUnit = serviceConfigurator.createDeploymentUnit(groupId, artifactid, version);
     }
 
     /**
@@ -51,22 +64,23 @@ public class Producer {
         parameters.put("item", item);
         parameters.put("level", level);
         parameters.put("actor", userId);
-        long processInstanceId = processService.startProcess(deploymentUnit.getIdentifier(), "UserTask", parameters);
-        instances.add(processInstanceId);
+        parameters.put("approved",approved);
+//        long processInstanceId = processService.startProcess(deploymentUnit.getIdentifier(), "UserTask", parameters);
+//        instances.add(processInstanceId);
+//
+//        List<TaskSummary> tasks = runtimeDataService.getTasksByStatusByProcessInstanceId(processInstanceId, null, new QueryFilter());
+//
+//        if (!tasks.isEmpty()) {
+//
+//            Long taskId = tasks.get(0).getId();
+//
+//            Map<String, Object> outputs = userTaskService.getTaskOutputContentByTaskId(taskId);
+//
+//            userTaskService.completeAutoProgress(taskId, userId, Collections.singletonMap("approved", approved));
+//
+//            return outputs;
+//        }
 
-        List<TaskSummary> tasks = runtimeDataService.getTasksByStatusByProcessInstanceId(processInstanceId, null, new QueryFilter());
-
-        if (!tasks.isEmpty()) {
-
-            Long taskId = tasks.get(0).getId();
-
-            Map<String, Object> outputs = userTaskService.getTaskOutputContentByTaskId(taskId);
-
-            userTaskService.completeAutoProgress(taskId, userId, Collections.singletonMap("approved", approved));
-
-            return outputs;
-        }
-
-        return null;
+        return parameters;
     }
 }

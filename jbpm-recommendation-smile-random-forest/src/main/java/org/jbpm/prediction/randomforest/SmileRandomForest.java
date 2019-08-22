@@ -116,8 +116,8 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
     public SmileRandomForest() {
 
         this(getInputsConfig(), getOutputsConfig());
-       //TODO add task
-        //train(getInputData(),getOutputData());
+        train(getInputData(),getOutputData());
+        logger.info("trained the smile random forest model");
     }
 
     public SmileRandomForest(Map<String, AttributeType> inputFeatures, OutputType outputType) {
@@ -235,6 +235,14 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
      */
     @Override
     public void train(Task task, Map<String, Object> inputData, Map<String, Object> outputData) {
+        addData(inputData, outputData.get(outcomeAttribute.getName()));
+    }
+    /**
+     * Train the random forest model
+     * @param inputData A map containing the input attribute names as keys and the attribute values as values.
+     * @param outputData A map containing the output attribute names as keys and the attribute values as values.
+     */
+    public void train(Map<String, Object> inputData, Map<String, Object> outputData) {
         addData(inputData, outputData.get(outcomeAttribute.getName()));
     }
 }

@@ -9,31 +9,32 @@ import org.kie.internal.query.QueryFilter;
 
 import java.util.*;
 
-public class InputProducer {
+public class Producer {
     protected ProcessService processService;
     protected UserTaskService userTaskService;
     protected RuntimeDataService runtimeDataService;
     protected DeploymentUnit deploymentUnit;
 
 
-    InputProducer()
+    Producer()
     {
-        build();
-        //TODO add this is to train model
+        getInputData();
     }
 
     /**
-     * build the data to be trained
+     * getInputData the data to be trained
      * @return
      */
-    public Map<String, Object> build()
+    public Map<String, Object> getInputData()
     {
-        Map<String, Object> outputs;
-        outputs = startAndReturnTaskOutputData("test item", "john", 5, false);
+        Map<String, Object> inputs = new HashMap<>();
         for (int i = 0; i < 20; i++) {
-            outputs = startAndReturnTaskOutputData("test item", "john", 5, true);
+            inputs.put("item", "test item");
+            inputs.put("level", 5);
+            inputs.put("actor", "john");
         }
-        return outputs;
+
+        return inputs;
     }
 
     /**
@@ -44,7 +45,7 @@ public class InputProducer {
      * @param approved
      * @return
      */
-    protected Map<String, Object> startAndReturnTaskOutputData(String item, String userId, Integer level, Boolean approved) {
+    protected Map<String, Object> getOutputData(String item, String userId, Integer level, Boolean approved) {
         List<Long> instances = new ArrayList<>();
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("item", item);

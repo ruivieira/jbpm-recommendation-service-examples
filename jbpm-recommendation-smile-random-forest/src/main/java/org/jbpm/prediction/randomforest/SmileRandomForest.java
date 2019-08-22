@@ -100,8 +100,24 @@ public class SmileRandomForest extends AbstractPredictionEngine implements Predi
         return outputType;
     }
 
+    public Map<String,Object> getInputData() {
+        Producer inputProducer = new Producer();
+        return inputProducer.getInputData();
+    }
+
+    public Map<String, Object> getOutputData() {
+        Producer producer = new Producer();
+        Map<String, Object> outputs = new HashMap<>();
+        for (int i = 0; i < 20; i++) {
+            outputs = producer.getOutputData("test item", "john", 5, true);
+        }
+        return outputs;
+    }
     public SmileRandomForest() {
+
         this(getInputsConfig(), getOutputsConfig());
+       //TODO add task
+        //train(getInputData(),getOutputData());
     }
 
     public SmileRandomForest(Map<String, AttributeType> inputFeatures, OutputType outputType) {

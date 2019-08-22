@@ -48,36 +48,24 @@ public abstract class AbstractPMMLBackend extends AbstractPredictionEngine imple
 
     }
 
+    protected abstract Map<String, Object> preProcess(Map<String, Object> data);
+
     protected Map<String, ?> evaluate(Map<String, Object> data) {
+        Map<String, Object> preProcessed = preProcess(data);
+
         Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
 
         for(InputField inputField : this.inputFields){
 
-            FieldName inputName = inputField.getName();
-            Object rawValue;
+            final FieldName inputName = inputField.getName();
 
-            // TODO: Automatically categorise features, remove hard-coding
-            if (inputName.getValue().equals("ActorId")) {
+            final Object rawValue = preProcessed.get(inputName.getValue());
 
-                String strValue = (String) data.get(inputName.getValue());
-
-                if (strValue.equals("john")) {
-                    rawValue = 0;
-                } else {
-                    rawValue = 1;
-                }
-
-            } else {
-                rawValue = data.get(inputName.getValue());
-            }
-
-            // Transforming an arbitrary user-supplied value to a known-good PMML value
-            FieldValue inputValue = inputField.prepare(rawValue);
+            final FieldValue inputValue = inputField.prepare(rawValue);
 
             arguments.put(inputName, inputValue);
         }
 
-        // Evaluating the model with known-good arguments
         Map<FieldName, ?> results = evaluator.evaluate(arguments);
         return EvaluatorUtil.decodeAll(results);
     }

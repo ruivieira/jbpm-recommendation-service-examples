@@ -11,7 +11,7 @@
   <artifactId>jbpm-recommendation-pmml-random-forest</artifactId>
 
   <properties>
-    <pmml-version>1.4.11</pmml-version>
+    <pmml-version>1.4.9</pmml-version>
   </properties>
 
   <name>jBPM :: Prediction :: PMML random Forest based prediction service</name>

@@ -123,6 +123,34 @@ public class PMMLRandomForestBackend extends AbstractPMMLBackend {
     }
 
     @Override
+    protected Map<String, Object> preProcess(Map<String, Object> data) {
+
+        Map<String, Object> preProcessed = new HashMap<>();
+
+        for (String input : data.keySet()) {
+
+            if (input.equals("ActorId")) {
+                String strValue = (String) data.get(input);
+
+                int rawValue;
+
+                if (strValue.equals("john")) {
+                    rawValue = 0;
+                } else {
+                    rawValue = 1;
+                }
+
+                preProcessed.put(input, rawValue);
+            } else {
+                preProcessed.put(input, data.get(input));
+            }
+
+        }
+
+        return preProcessed;
+    }
+
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
